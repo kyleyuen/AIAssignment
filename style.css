@@ -1,0 +1,11 @@
+#board {
+	width: 720px;
+	margin: auto;
+	position: relative;
+}
+
+img.number {
+	position: absolute;
+	width: 200px;
+	height: 200px;
+}
