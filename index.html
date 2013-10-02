@@ -1,24 +1,36 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<link rel="stylesheet" type="text/css" href="style.css" />
-		<script type="text/javascript" src="jquery-1.10.2.js"></script>
-		<script type="text/javascript" src="initial.js"></script>
-		<script type="text/javascript" src="main.js"></script>
-		<script type="text/javascript" src="try.js"></script>
-		<title>game</title>
+		<link rel="stylesheet" type="text/css" href="css/style.css" />
+		<script type="text/javascript" src="js/jquery-1.10.2.js"></script>
+		<script type="text/javascript" src="js/initial.js"></script>
+		<script type="text/javascript" src="js/main.js"></script>
+		<script type="text/javascript" src="js/play.js"></script>
+
+		<!-- Bootstrap -->
+    	<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    	<script src="js/bootstrap.min.js"></script>
+
+    	<title>eight figure puzzle</title>
 	</head>
 
 	<body>
+		<div id="sidebar" class="btn-group btn-group-vertical">
+			<button id="initialStateButton" class="btn" type="button">initial state</button>
+			<button id="targetStateButton" class="btn" type="button">target state</button>
+			<button id="autoplayButton" class="btn" type="button">autoplay</bytton>
+			<button id="shuffleButton" class="btn" type="button">shuffle</button>
+		</div>
+
 		<div id="board">
-			<img class="number" id="one" src='numbers/1_filled.png' />
-			<img class="number" id="two" src='numbers/2_filled.png' />
-			<img class="number" id="three" src='numbers/3_filled.png' />
-			<img class="number" id="four" src='numbers/4_filled.png' />
-			<img class="number" id="five" src='numbers/5_filled.png' />
-			<img class="number" id="six" src='numbers/6_filled.png' />
-			<img class="number" id="seven" src='numbers/7_filled.png' />
-			<img class="number" id="eight" src='numbers/8_filled.png' />
+			<img class="number" id="one" src='picture/numbers/1_filled.png' />
+			<img class="number" id="two" src='picture/numbers/2_filled.png' />
+			<img class="number" id="three" src='picture/numbers/3_filled.png' />
+			<img class="number" id="four" src='picture/numbers/4_filled.png' />
+			<img class="number" id="five" src='picture/numbers/5_filled.png' />
+			<img class="number" id="six" src='picture/numbers/6_filled.png' />
+			<img class="number" id="seven" src='picture/numbers/7_filled.png' />
+			<img class="number" id="eight" src='picture/numbers/8_filled.png' />
 		</div>
 	</body>
 </html>
