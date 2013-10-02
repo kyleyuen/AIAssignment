@@ -11,11 +11,13 @@ $(document).ready(function() {
 	// inital and shuffle state array
 	var state = initial();
 	// render pictures to page in proper position
-	assighToBoard(state, numberToText, WIDTH, HEIGHT, REGULAR_PADDING);
+	
 
-	//console.log(state.toString() === target.toString());
-	randomPlay(state);
 	//alert("congratulations");
+	var initialState = [[8, 9, 3], [2, 1, 4], [7, 6, 5]];
+	assighToBoard(initialState, numberToText, WIDTH, HEIGHT, REGULAR_PADDING);
+	var targetState = [[1, 2, 3], [8, 9, 4], [7, 6, 5]];
+	play(initialState, targetState);
 })
 
 function assighToBoard(state)

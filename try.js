@@ -1,37 +1,41 @@
 // define a move's property, which contains state, blank postion,
 // function value and last move node's index
-function Move(state, blankX, blankY, gValue, hValue, lastMove)
+function Move(state, blankX, blankY, gValue, hValue, lastMoveIndex, operation)
 {
 	this.state = state;
 	this.blankX = blankX;
 	this.blankY = blankY;
 	this.gValue = gValue;
 	this.hValue = hValue;
-	this.lastMove = lastMove;
+	this.lastMoveIndex = lastMoveIndex;
+	this.operation = operation;
 }
 
-function play(state)
+function play(initialState, targetState)
 {
-	//var maxMoves = 10000;
+	var maxMoves = 1024;
+	var targetStateToNumber = stateToNumber(targetState);
+	var blankPosition = getPosition(initialState, 9);
+
 	var open = new Array();
 	var closed = new Array();
-	var states = new Array();
+	var reachedStates = new Array();
 	var directions = [[-1, 0], [0, 1], [1, 0], [0, -1]];
 
 	var index = 0;
-	var start = new Move(stateToNumber(state), 2, 2, 0, heuristicFunction(state), -1);
+	var start = new Move(stateToNumber(initialState), blankPosition[0], blankPosition[1],
+						 0, heuristicFunction(initialState, targetState), -1, -1);
 	open.push(start);
 
 	// run A* algorithm
 	while (open.length != 0) {
 		// get minimum value node from open list
-		var nodeIndex = minimumNodeIndex(open);
+		var node = getMinimumNode(open);
 		// put this node to closed list and delete from open list
-		closed.push(open[nodeIndex]);
-		open.splice(nodeIndex, 1);
+		closed.push(node);
 
 		// if reach target state, then braek out loop
-		if (closed[index].state == 123456789) {
+		if (closed[index].state == targetStateToNumber) {
 			break;
 		}
 
@@ -45,10 +49,11 @@ function play(state)
 			if (isValidMove(blankX, blankY)) {
 				swap(currentState, closed[index].blankX, closed[index].blankY, blankX, blankY);
 				var nextState = stateToNumber(currentState);
-				if (states.indexOf(nextState) == -1) {
-					states.push(nextState);
+				if (reachedStates.indexOf(nextState) == -1) {
+					reachedStates.push(nextState);
 					var node = new Move(nextState, blankX, blankY, 
-						closed[index].gValue + 1, heuristicFunction(state), index);
+										closed[index].gValue + 1, 
+										heuristicFunction(currentState, targetState), index, i);
 					open.push(node);
 				}
 				swap(currentState, closed[index].blankX, closed[index].blankY, blankX, blankY);
@@ -56,22 +61,15 @@ function play(state)
 		}
 
 		++index;
-		if (index > 1024) {
-			console.log("no solution");
-			break;
+		if (index > maxMoves) {
+			alert("no solution");
+			return false;
 		}
 	}
-	printPath(index - 1);
 
-	function printPath(index)
-	{
-		if (index == 0) {
-			console.log(closed[index].state);
-			return;
-		}
-		printPath(closed[index].lastMove);
-		console.log(closed[index].state);
-	}
+	var path = getPath(closed, index);
+	movePictureByJQuery(closed, path, 1);
+	console.log(path);
 }
 
 // translate state array to number, try to save memory
@@ -102,20 +100,33 @@ function numberToState(number)
 }
 
 // calculate current state number's distance to target state
-function heuristicFunction(state)
+function heuristicFunction(currentState, targetState)
 {
 	var result = 0;
 	for (var i = 0; i < 3; ++i) {
 		for (var j = 0; j < 3; ++j) {
-			var distance = Math.abs(i - Math.floor((state[i][j] - 1)/3)) +
-							Math.abs(j - Math.floor((state[i][j] - 1)%3));
+			var postion = getPosition(currentState, targetState[i][j]);
+			var distance = Math.abs(i - postion[0]) + Math.abs(j - postion[1]);
 			result = result + distance;
 		}
 	}
 	return result;
 }
 
-function minimumNodeIndex(nodes)
+// get specific number's position in state array
+function getPosition(state, number)
+{
+	for (var i = 0; i < 3; ++i) {
+		for (var j = 0; j < 3; ++j) {
+			if (state[i][j] == number) {
+				return [i, j];
+			}
+		}
+	}
+}
+
+// get minimum value node from open list
+function getMinimumNode(nodes)
 {
 	var value = 100000;
 	var index = -1;
@@ -125,9 +136,13 @@ function minimumNodeIndex(nodes)
 			index = i;
 		}
 	}
-	return index;
+
+	var result = nodes[index];
+	nodes.splice(index, 1);
+	return result;
 }
 
+// judge given position is valid or not
 function isValidMove(blankX, blankY)
 {
 	if (blankX < 0 || blankX > 2) {
@@ -146,39 +161,59 @@ function swap(state, x1, y1, x2, y2)
 	state[x2][y2] = temp;
 }
 
-
-//--------------------------------------------
-$(document).ready(function() {
-	var numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-	shuffle(numbers);
-	numbers = sliceToChunk(numbers, 3);
-	play(numbers);
-});
-
-function shuffle(numbers)
+function getPath(closed, index)
 {
-	if (numbers.length == 0) {
-		return
+	var path = new Array();
+	while (closed[index].lastMoveIndex != -1) {
+		path.push(index);
+		index = closed[index].lastMoveIndex;
 	}
-
-	var i = numbers.length - 1;
-	while (--i) {
-		var j = Math.floor(Math.random()*i);
-		var temp = numbers[i];
-		numbers[i] = numbers[j];
-		numbers[j] = temp;
-	}
+	path.push(index);
+	return path.reverse();
 }
 
-function sliceToChunk(numbers, chunk)
+function movePictureByJQuery(closed, path, index)
 {
-	var length = Math.floor((numbers.length - 1) / chunk);
-	var result = new Array(length);
-
-	var start = 0;
-	for (var i = 0; i <= length; ++i) {
-		result[i] = numbers.slice(start, start + chunk);
-		start = start + chunk;
+	if (index == path.length) {
+		return;
 	}
-	return result;
+
+	var lastState = numberToState(closed[path[index - 1]].state);
+	var id = "#" + numberToText[lastState[closed[path[index]].blankX][closed[path[index]].blankY]];
+
+	var attr;
+	var effect;
+	switch (closed[path[index]].operation) {
+		// up
+		case 0:
+			attr = "top";
+			effect = "+=" + (HEIGHT + REGULAR_PADDING).toString() + "px";
+			break;
+		// right
+		case 1:
+			attr = "left";
+			effect = "-=" + (WIDTH + REGULAR_PADDING).toString() + "px";
+			break;
+		// down
+		case 2:
+			attr = "top";
+			effect = "-=" + (HEIGHT + REGULAR_PADDING).toString() + "px";
+			break;
+		// left
+		case 3:
+			attr = "left";
+			effect = "+=" + (WIDTH + REGULAR_PADDING).toString() + "px";
+			break;
+	}
+
+	var animation;
+	if (attr === "top") {
+		animation = $(id).animate({top: effect});
+	}
+	else if (attr === "left") {
+		animation = $(id).animate({left: effect});
+	}
+	$.when(animation).done(function() {
+		movePictureByJQuery(closed, path, index + 1);
+	});
 }
