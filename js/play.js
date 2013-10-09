@@ -14,7 +14,7 @@ function Move(state, blankX, blankY, gValue, hValue, lastMoveIndex, operation)
 
 function play(initialState, targetState)
 {
-	var maxMoves = 1024;
+	var maxMoves = 4096;
 	var targetStateToNumber = stateToNumber(targetState);
 	var blankPosition = getPosition(initialState, 9);
 
@@ -106,6 +106,9 @@ function heuristicFunction(currentState, targetState)
 	var result = 0;
 	for (var i = 0; i < 3; ++i) {
 		for (var j = 0; j < 3; ++j) {
+			if (targetState[i][j] == 9) {
+				continue;
+			}
 			var postion = getPosition(currentState, targetState[i][j]);
 			var distance = Math.abs(i - postion[0]) + Math.abs(j - postion[1]);
 			result = result + distance;

@@ -1,10 +1,11 @@
 #sidebar {
+	width: 160px;
 	float: left;
 }
 
 #board {
 	width: 720px;
-	margin: auto;
+	margin-left: 300px;
 	position: relative;
 }
 
